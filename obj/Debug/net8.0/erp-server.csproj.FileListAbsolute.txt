@@ -32,3 +32,9 @@ C:\coding\coding\order-erp\erp-server\obj\Debug\net8.0\erp-server.genruntimeconf
 C:\coding\coding\order-erp\erp-server\obj\Debug\net8.0\ref\erp-server.dll
 C:\coding\coding\order-erp\erp-server\bin\Debug\net8.0\System.IO.Hashing.dll
 C:\coding\coding\order-erp\erp-server\bin\Debug\net8.0\Yarp.ReverseProxy.dll
+C:\coding\coding\order-erp\erp-server\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\coding\coding\order-erp\erp-server\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\coding\coding\order-erp\erp-server\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\coding\coding\order-erp\erp-server\bin\Debug\net8.0\MySqlConnector.dll
+C:\coding\coding\order-erp\erp-server\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+C:\coding\coding\order-erp\erp-server\obj\Debug\net8.0\erp-server.sourcelink.json
