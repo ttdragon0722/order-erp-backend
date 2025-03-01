@@ -2,13 +2,45 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Yarp.ReverseProxy;
 using Yarp.ReverseProxy.Configuration;
+using Microsoft.EntityFrameworkCore;
+using erp_server.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // ✅ 保留原本的 API 設定
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+// ✅ 連上database server
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    var serverVersion = ServerVersion.AutoDetect(connectionString);
+    options.UseMySql(connectionString, serverVersion);
+});
+
+// 🔍 測試資料庫連線 (加在這裡)
+try
+{
+    using var scope = builder.Services.BuildServiceProvider().CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    // 嘗試開啟連線
+    db.Database.OpenConnection();
+    Console.WriteLine("✅ 資料庫連線成功！");
+
+    // 關閉連線
+    db.Database.CloseConnection();
+}
+catch (Exception ex)
+{
+    Console.WriteLine("❌ 無法連線到資料庫！");
+    Console.WriteLine($"🔍 錯誤訊息: {ex.Message}");
+}
+
+
 
 // ✅ 加入 YARP 反向代理設定
 builder.Services.AddReverseProxy()
@@ -41,6 +73,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"🔍 來自 {context.Connection.RemoteIpAddress} 的請求");
+    Console.WriteLine($"🔍 轉發標頭 X-Forwarded-For: {context.Request.Headers["X-Forwarded-For"]}");
+    await next();
+});
 
 app.UseHttpsRedirection();
 
