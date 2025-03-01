@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using erp_server.Dtos;
 
 [ApiController]
-[Route("api/login")]
+[Route("api/logindebug")]
 public class LoginController : ControllerBase
 {
     [HttpPost]
@@ -13,7 +13,7 @@ public class LoginController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        if (request.Username == "admin" && request.Password == "123456")
+        if (request.UserId == "admin" && request.Password == "123456")
         {
             return Ok(new { message = "Login successful", token = "your_jwt_token_here" });
         }

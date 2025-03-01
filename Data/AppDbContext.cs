@@ -13,6 +13,7 @@ namespace erp_server.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductMaterial> ProductMaterials { get; set; }
         public DbSet<OptionTable> Options { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,11 @@ namespace erp_server.Data
                 .HasOne(pm => pm.Material)
                 .WithMany(m => m.ProductMaterials)
                 .HasForeignKey(pm => pm.MaterialId);
+
+            // user id 設定
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.UserId)
+                .IsUnique();
         }
     }
 }
