@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace erp_server.Models
+namespace erp_server.Dtos
 {
     public class LoginRequest
     {
