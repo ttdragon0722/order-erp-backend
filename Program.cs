@@ -5,6 +5,9 @@ using Yarp.ReverseProxy.Configuration;
 using Microsoft.EntityFrameworkCore;
 using erp_server.Data;
 
+// repository import
+using erp_server.Services.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -20,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     var serverVersion = ServerVersion.AutoDetect(connectionString);
     options.UseMySql(connectionString, serverVersion);
 });
+
+builder.Services.AddScoped<UserService>();
 
 // 🔍 測試資料庫連線 (加在這裡)
 try
@@ -73,13 +78,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"🔍 來自 {context.Connection.RemoteIpAddress} 的請求");
-    Console.WriteLine($"🔍 轉發標頭 X-Forwarded-For: {context.Request.Headers["X-Forwarded-For"]}");
-    await next();
-});
 
 app.UseHttpsRedirection();
 

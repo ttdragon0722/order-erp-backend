@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,29 +9,42 @@ using erp_server.Dtos;
 
 using System.Text;
 
+// repository
+using erp_server.Services.Repositories;
+
 [ApiController]
 [Route("api")]
 public class UsersController : ControllerBase
 {
-    private readonly AppDbContext _context;
     private readonly IConfiguration _config;
+    private readonly UserService _userService;
 
-    public UsersController(AppDbContext context, IConfiguration config)
+
+    public UsersController(UserService userService, IConfiguration config)
     {
-        _context = context;
         _config = config;
+        _userService = userService;
     }
 
-    // 註冊 API
+    /// <summary>
+    /// 註冊新使用者
+    /// </summary>
+    /// <param name="dto">使用者註冊資料</param>
+    /// <returns>註冊成功或失敗的訊息</returns>
+    /// <response code="200">註冊成功</response>
+    /// <response code="400">帳號已存在</response>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromForm] RegisterDto dto)
     {
-        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == dto.UserId);
+        var existingUser = await _userService.GetByUserIdAsync(dto.UserId);
         if (existingUser != null)
-            return BadRequest("帳號已存在");
+            return StatusCode(StatusCodes.Status409Conflict, new ApiResponse<object>
+            {
+                Success = false,
+                Message = "帳號已存在"
+            });
 
-        string salt, hashedPassword;
-        hashedPassword = PasswordHelper.HashPassword(dto.Password, out salt);
+        string hashedPassword = PasswordHelper.HashPassword(dto.Password, out string salt);
 
         var user = new User
         {
@@ -43,9 +54,13 @@ public class UsersController : ControllerBase
             Name = dto.Name
         };
 
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return Ok("註冊成功");
+        await _userService.Register(user);
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Message = "註冊成功"
+        });
+
     }
 
     private string GenerateJwtToken(User user)
@@ -73,9 +88,15 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromForm] LoginRequest dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == dto.UserId);
+        var user = await _userService.GetByUserIdAsync(dto.UserId);
         if (user == null || !PasswordHelper.VerifyPassword(dto.Password, user.Salt, user.Password))
-            return Unauthorized("帳號或密碼錯誤");
+        {
+            return Unauthorized(new ApiResponse<object>
+            {
+                Success = false,
+                Message = "帳號或密碼錯誤"
+            });
+        }
 
         var token = GenerateJwtToken(user);
 
@@ -87,7 +108,34 @@ public class UsersController : ControllerBase
             SameSite = SameSiteMode.Strict, // 防止 CSRF
             Expires = DateTime.UtcNow.AddDays(7) // 7 天後過期
         });
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Message = "登入成功",
+            Data = new
+            {
+                UserId = user.Id
+            }
+        });
 
-        return Ok(new { message = "登入成功", userId = user.Id });
+    }
+
+    // 登出 API
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Append("auth_token", "", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(-1) // 設定過去的時間，使 Cookie 失效
+        });
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Message = "登出成功"
+        });
     }
 }
