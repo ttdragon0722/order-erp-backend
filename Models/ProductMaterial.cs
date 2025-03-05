@@ -6,10 +6,10 @@ namespace erp_server.Models
     {
         [ForeignKey("Product")]
         public Guid ProductId { get; set; }
-        public virtual Product Product { get; set; }
+        public virtual Product? Product { get; set; }
 
         [ForeignKey("Material")]
         public Guid MaterialId { get; set; }
-        public virtual Material Material { get; set; }
+        public virtual Material? Material { get; set; }
     }
 }
