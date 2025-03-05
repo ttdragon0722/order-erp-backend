@@ -8,6 +8,10 @@ using erp_server.Data;
 // repository import
 using erp_server.Services.Repositories;
 
+// todo 刪除這個模組
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -25,6 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<MaterialService>();
 
 // 🔍 測試資料庫連線 (加在這裡)
 try
@@ -44,8 +49,6 @@ catch (Exception ex)
     Console.WriteLine("❌ 無法連線到資料庫！");
     Console.WriteLine($"🔍 錯誤訊息: {ex.Message}");
 }
-
-
 
 // ✅ 加入 YARP 反向代理設定
 builder.Services.AddReverseProxy()
