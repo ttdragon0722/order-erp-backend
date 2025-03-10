@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace erp_server.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/settings")]
     public class BusinessSettingsController : ControllerBase
     {
@@ -20,7 +21,6 @@ namespace erp_server.Controllers
         /// 取得所有商業設置狀態
         /// </summary>
         /// <returns>商業設置資料</returns>
-
         [HttpGet("getStatus")]
         public async Task<IActionResult> GetStatus()
         {

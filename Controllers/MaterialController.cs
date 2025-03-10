@@ -8,27 +8,14 @@ namespace erp_server.Controllers
 {
     [ApiController]
     [Route("api")]
-    public class MaterialController : ControllerBase
+    public class MaterialController(MaterialService materialService) : ControllerBase
     {
-        private readonly MaterialService _materialService;
-
-        public MaterialController(MaterialService materialService)
-        {
-            _materialService = materialService;
-        }
+        private readonly MaterialService _materialService = materialService;
 
         [Authorize]
         [HttpGet("getMaterials")]
         public async Task<IActionResult> GetMaterials()
         {
-            if (Request.Headers.TryGetValue("Authorization", out var authHeader))
-            {
-                Console.WriteLine($"🔹 Received Authorization Header: {authHeader}");
-            }
-            else
-            {
-                Console.WriteLine("⚠️ No Authorization Header received.");
-            }
             var materialData = await _materialService.GetAll();
 
             return Ok(new ApiResponse<object>

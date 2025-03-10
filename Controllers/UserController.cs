@@ -14,27 +14,22 @@ using erp_server.Dtos;
 using erp_server.Services.Repositories;
 
 using erp_server.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace erp_server.Controllers
 {
     [ApiController]
     [Route("api")]
-    public class UsersController : ControllerBase
+    public class UsersController(UserService userService, IConfiguration config) : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly UserService _userService;
-
-
-        public UsersController(UserService userService, IConfiguration config)
-        {
-            _config = config;
-            _userService = userService;
-        }
+        private readonly IConfiguration _config = config;
+        private readonly UserService _userService = userService;
 
         /// <summary>
         /// 註冊新使用者
         /// </summary>
         /// <param name="dto">使用者註冊資料</param>
+        [Authorize]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto dto)
         {
@@ -131,6 +126,7 @@ namespace erp_server.Controllers
         }
 
         // 登出 API
+        [Authorize]
         [HttpPost("logout")]
         public IActionResult Logout()
         {
