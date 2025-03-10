@@ -12,6 +12,7 @@ using erp_server.Services.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using erp_server.Services;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -71,6 +72,7 @@ void RegisterScopedServices(IServiceCollection services)
     builder.Services.AddScoped<DatabaseTester>();
     services.AddScoped<UserService>();
     services.AddScoped<MaterialService>();
+    services.AddScoped<BusinessSettingsService>();
 
     // 可以在這裡繼續新增其他的 Scoped 服務
 }
@@ -105,7 +107,45 @@ void ConfigureServices(WebApplicationBuilder builder)
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        // ✅ 設定其他服務
+        // ✅ 設定 JWT 驗證
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"], // 來自 appsettings.json
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+                    )
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (string.IsNullOrEmpty(context.Token))
+                        {
+                            // 如果 Header 沒有，則從 Cookie 讀取
+                            var token = context.Request.Cookies["auth_token"];
+                            if (!string.IsNullOrEmpty(token))
+                            {
+                                context.Token = token;
+                            }
+                        }
+                        return Task.CompletedTask;
+                    }
+
+                };
+            });
+
+        builder.Services.AddAuthorization(); // 🔹 啟用授權機制
+
+        // ✅ 註冊 Scoped 服務
         RegisterScopedServices(builder.Services);
 
         // 列出已註冊的 Scoped 服務
@@ -118,6 +158,7 @@ void ConfigureServices(WebApplicationBuilder builder)
         Console.WriteLine($"🔍 錯誤訊息: {ex.Message}");
     }
 }
+
 
 void ConfigureReverseProxy(WebApplicationBuilder builder)
 {
@@ -154,14 +195,18 @@ void ConfigureMiddleware(WebApplication app)
     }
 
     app.UseHttpsRedirection();
-    app.UseAuthorization();
-    app.MapControllers(); // 保留 API 路由
 
     // ✅ 加入反向代理
     app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers(); // 保留 API 路由
+
     app.MapReverseProxy(); // 轉發 Next.js 的請求
-    
-    
+
+
     // debug: 在此測試資料庫連線
     TestDatabaseConnection(app);
     Console.WriteLine("✅ 應用中介軟體設定完成");

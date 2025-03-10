@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using erp_server.Data;
 
@@ -11,9 +12,11 @@ using erp_server.Data;
 namespace erp_server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310063054_removeBusinessSettingsId")]
+    partial class removeBusinessSettingsId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,34 +27,17 @@ namespace erp_server.Migrations
 
             modelBuilder.Entity("erp_server.Models.BusinessSettings", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
                     b.Property<bool>("EnableDelivery")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true)
-                        .HasComment("啟用外送");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("EnableDineIn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true)
-                        .HasComment("啟用內用");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("EnableOrdering")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true)
-                        .HasComment("點餐系統啟用");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("EnableTakeout")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true)
-                        .HasComment("啟用外帶");
-
-                    b.HasKey("Id");
+                        .HasColumnType("tinyint(1)");
 
                     b.ToTable("BusinessSettings");
                 });

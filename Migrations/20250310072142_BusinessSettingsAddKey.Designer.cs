@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using erp_server.Data;
 
@@ -11,9 +12,11 @@ using erp_server.Data;
 namespace erp_server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310072142_BusinessSettingsAddKey")]
+    partial class BusinessSettingsAddKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,9 +27,6 @@ namespace erp_server.Migrations
 
             modelBuilder.Entity("erp_server.Models.BusinessSettings", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
                     b.Property<bool>("EnableDelivery")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
@@ -51,7 +51,8 @@ namespace erp_server.Migrations
                         .HasDefaultValue(true)
                         .HasComment("啟用外帶");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Id")
+                        .HasColumnType("longtext");
 
                     b.ToTable("BusinessSettings");
                 });

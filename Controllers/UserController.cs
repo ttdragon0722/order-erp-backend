@@ -123,7 +123,8 @@ namespace erp_server.Controllers
                 Message = "登入成功",
                 Data = new
                 {
-                    UserId = user.Id
+                    UserId = user.Id,
+                    AuthToken = token
                 }
             });
 
