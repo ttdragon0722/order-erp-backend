@@ -1,106 +1,162 @@
 using Microsoft.AspNetCore.Mvc;
-using erp_server.Services.Repositories;
-using erp_server.Dtos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using erp_server.Services.Repositories;
+using System;
+using System.Threading.Tasks;
 
 namespace erp_server.Controllers
 {
     [ApiController]
     [Authorize]
     [Route("api/settings")]
-    public class BusinessSettingsController : ControllerBase
+    public class BusinessSettingsController(ILogger<BusinessSettingsController> logger, BusinessSettingsService businessService) : ControllerBase
     {
-        private readonly BusinessSettingsService _businessService;
-
-        public BusinessSettingsController(BusinessSettingsService businessService)
-        {
-            _businessService = businessService;
-        }
+        private readonly ILogger<BusinessSettingsController> _logger = logger;
+        private readonly BusinessSettingsService _businessService = businessService;
 
         /// <summary>
-        /// 取得所有商業設置狀態
+        /// 取得所有商業設置狀態。
         /// </summary>
-        /// <returns>商業設置資料</returns>
         [HttpGet("getStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetStatus()
         {
-            var allSetting = await _businessService.GetAllSettingsAsync();
-
-            return Ok(new ApiResponse<object>
+            try
             {
-                Success = true,
-                Message = "取得設定檔",
-                Data = allSetting
-            });
+                var allSetting = await _businessService.GetAllSettingsAsync();
+                return Ok(allSetting);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "取得商業設置時發生錯誤");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "伺服器發生錯誤，請稍後再試。",
+                    ErrorCode = "INTERNAL_SERVER_ERROR"
+                });
+            }
         }
 
         /// <summary>
         /// 設定開機狀態
         /// </summary>
-        /// <param name="isEnabled">是否啟用開機狀態</param>
-        /// <returns>回傳更新結果</returns>
         [HttpPost("setEnableOrderingStatus")]
-        public async Task<IActionResult> SetEnableOrderingStatus([FromBody] bool isEnabled)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SetEnableOrderingStatus([FromBody] bool? isEnabled)
         {
-            await _businessService.SetEnableOrderingStatusAsync(isEnabled);
-            return Ok(new ApiResponse<object>
+            if (isEnabled == null)
             {
-                Success = true,
-                Message = "成功更新開機狀態",
-                Data = isEnabled
-            });
+                return BadRequest(new { Message = "請提供有效的 isEnabled 參數。" });
+            }
+
+            try
+            {
+                await _businessService.SetEnableOrderingStatusAsync(isEnabled.Value);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "設定開機狀態時發生錯誤");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "伺服器發生錯誤，請稍後再試。",
+                    ErrorCode = "INTERNAL_SERVER_ERROR"
+                });
+            }
         }
 
         /// <summary>
         /// 設定內用狀態
         /// </summary>
-        /// <param name="isEnabled">是否啟用內用狀態</param>
-        /// <returns>回傳更新結果</returns>
         [HttpPost("setDineInStatus")]
-        public async Task<IActionResult> SetDineInStatus([FromBody] bool isEnabled)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SetDineInStatus([FromBody] bool? isEnabled)
         {
-            await _businessService.SetDineInStatusAsync(isEnabled);
-            return Ok(new ApiResponse<object>
+            if (isEnabled == null)
             {
-                Success = true,
-                Message = "成功更新內用狀態",
-                Data = isEnabled
-            });
+                return BadRequest(new { Message = "請提供有效的 isEnabled 參數。" });
+            }
+
+            try
+            {
+                await _businessService.SetDineInStatusAsync(isEnabled.Value);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "設定內用狀態時發生錯誤");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "伺服器發生錯誤，請稍後再試。",
+                    ErrorCode = "INTERNAL_SERVER_ERROR"
+                });
+            }
         }
 
         /// <summary>
         /// 設定外帶狀態
         /// </summary>
-        /// <param name="isEnabled">是否啟用外帶狀態</param>
-        /// <returns>回傳更新結果</returns>
         [HttpPost("setTakeoutStatus")]
-        public async Task<IActionResult> SetTakeoutStatus([FromBody] bool isEnabled)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SetTakeoutStatus([FromBody] bool? isEnabled)
         {
-            await _businessService.SetTakeoutStatusAsync(isEnabled);
-            return Ok(new ApiResponse<object>
+            if (isEnabled == null)
             {
-                Success = true,
-                Message = "成功更新外帶狀態",
-                Data = isEnabled
-            });
+                return BadRequest(new { Message = "請提供有效的 isEnabled 參數。" });
+            }
+
+            try
+            {
+                await _businessService.SetTakeoutStatusAsync(isEnabled.Value);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "設定外帶狀態時發生錯誤");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "伺服器發生錯誤，請稍後再試。",
+                    ErrorCode = "INTERNAL_SERVER_ERROR"
+                });
+            }
         }
 
         /// <summary>
         /// 設定外送狀態
         /// </summary>
-        /// <param name="isEnabled">是否啟用外送狀態</param>
-        /// <returns>回傳更新結果</returns>
-
         [HttpPost("setDeliveryStatus")]
-        public async Task<IActionResult> SetDeliveryStatus([FromBody] bool isEnabled)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SetDeliveryStatus([FromBody] bool? isEnabled)
         {
-            await _businessService.SetDeliveryStatusAsync(isEnabled);
-            return Ok(new ApiResponse<object>
+            if (isEnabled == null)
             {
-                Success = true,
-                Message = "成功更新外送狀態",
-                Data = isEnabled
-            });
+                return BadRequest(new { Message = "請提供有效的 isEnabled 參數。" });
+            }
+
+            try
+            {
+                await _businessService.SetDeliveryStatusAsync(isEnabled.Value);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "設定外送狀態時發生錯誤");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "伺服器發生錯誤，請稍後再試。",
+                    ErrorCode = "INTERNAL_SERVER_ERROR"
+                });
+            }
         }
     }
 }
