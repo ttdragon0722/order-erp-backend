@@ -69,8 +69,8 @@ namespace erp_server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("Stock")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
 
                     b.Property<int?>("StockAmount")
                         .HasColumnType("int");
@@ -78,6 +78,21 @@ namespace erp_server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Materials");
+                });
+
+            modelBuilder.Entity("erp_server.Models.MaterialTags", b =>
+                {
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("MaterialId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("MaterialTags");
                 });
 
             modelBuilder.Entity("erp_server.Models.OptionTable", b =>
@@ -239,6 +254,25 @@ namespace erp_server.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("erp_server.Models.MaterialTags", b =>
+                {
+                    b.HasOne("erp_server.Models.Material", "Material")
+                        .WithMany("MaterialTags")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("erp_server.Models.Tag", "Tag")
+                        .WithMany("MaterialTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("erp_server.Models.OptionTable", b =>
                 {
                     b.HasOne("erp_server.Models.Material", "Material")
@@ -290,12 +324,19 @@ namespace erp_server.Migrations
 
             modelBuilder.Entity("erp_server.Models.Material", b =>
                 {
+                    b.Navigation("MaterialTags");
+
                     b.Navigation("ProductMaterials");
                 });
 
             modelBuilder.Entity("erp_server.Models.Product", b =>
                 {
                     b.Navigation("ProductMaterials");
+                });
+
+            modelBuilder.Entity("erp_server.Models.Tag", b =>
+                {
+                    b.Navigation("MaterialTags");
                 });
 #pragma warning restore 612, 618
         }

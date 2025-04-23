@@ -16,6 +16,7 @@ namespace erp_server.Models
         public Guid? TypeId { get; set; }
         public virtual TypeEntity? Type { get; set; }
 
-        public virtual ICollection<ProductMaterial>? ProductMaterials { get; set; }
+        public virtual ICollection<ProductMaterial>? ProductMaterials { get; set; } = new List<ProductMaterial>();
+
     }
 }
