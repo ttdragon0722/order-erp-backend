@@ -9,14 +9,19 @@ namespace erp_server.Models
         [Key]
         public Guid Id { get; set; }
         public required string Name { get; set; }
-        public decimal Price { get; set; }
+        public decimal Price { get; set; } = 0;
         public bool Enable { get; set; } = true;
 
-        [ForeignKey("TypeEntity")]
-        public Guid? TypeId { get; set; }
-        public virtual TypeEntity? Type { get; set; }
 
-        public virtual ICollection<ProductMaterial>? ProductMaterials { get; set; } = new List<ProductMaterial>();
+        public Guid TypeId { get; set; }
+        
+        [ForeignKey("TypeId")]
+        public TypeEntity? Type { get; set; }
+        public ICollection<ProductTag>? ProductTags { get; set; }
+        public ICollection<ProductMaterial>? ProductMaterials { get; set; }
 
+        public ICollection<ProductExcludedOption>? ExcludedOptions { get; set; }
+
+        public ICollection<ProductOption>? ProductOptions { get; set; }
     }
 }

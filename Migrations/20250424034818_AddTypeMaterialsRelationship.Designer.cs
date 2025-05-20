@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using erp_server.Data;
 
@@ -11,9 +12,11 @@ using erp_server.Data;
 namespace erp_server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424034818_AddTypeMaterialsRelationship")]
+    partial class AddTypeMaterialsRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,55 +111,14 @@ namespace erp_server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("OptionChildrenId")
-                        .HasColumnType("char(36)");
-
                     b.Property<double>("Price")
                         .HasColumnType("double");
-
-                    b.Property<bool>("Require")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Depend");
 
-                    b.HasIndex("OptionChildrenId");
-
                     b.ToTable("Options");
-                });
-
-            modelBuilder.Entity("erp_server.Models.OptionChildren", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OptionChildren");
-                });
-
-            modelBuilder.Entity("erp_server.Models.OptionRadio", b =>
-                {
-                    b.Property<Guid>("OptionId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ChildrenId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("OptionId", "ChildrenId");
-
-                    b.HasIndex("ChildrenId");
-
-                    b.ToTable("OptionRadios");
                 });
 
             modelBuilder.Entity("erp_server.Models.Product", b =>
@@ -395,30 +357,7 @@ namespace erp_server.Migrations
                         .HasForeignKey("Depend")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("erp_server.Models.OptionChildren", null)
-                        .WithMany("Options")
-                        .HasForeignKey("OptionChildrenId");
-
                     b.Navigation("Material");
-                });
-
-            modelBuilder.Entity("erp_server.Models.OptionRadio", b =>
-                {
-                    b.HasOne("erp_server.Models.OptionChildren", "OptionChildren")
-                        .WithMany()
-                        .HasForeignKey("ChildrenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("erp_server.Models.Option", "Option")
-                        .WithMany()
-                        .HasForeignKey("OptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Option");
-
-                    b.Navigation("OptionChildren");
                 });
 
             modelBuilder.Entity("erp_server.Models.Product", b =>
@@ -564,11 +503,6 @@ namespace erp_server.Migrations
                     b.Navigation("ProductOptions");
 
                     b.Navigation("TypeOptions");
-                });
-
-            modelBuilder.Entity("erp_server.Models.OptionChildren", b =>
-                {
-                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("erp_server.Models.Product", b =>

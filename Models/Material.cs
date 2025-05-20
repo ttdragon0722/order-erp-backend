@@ -15,16 +15,19 @@ namespace erp_server.Models
 
         public int? StockAmount { get; set; }
 
-        public virtual ICollection<ProductMaterial>? ProductMaterials { get; set; } = new List<ProductMaterial>();
-        public virtual ICollection<MaterialTags> MaterialTags { get; set; } = new List<MaterialTags>();
+        public ICollection<MaterialTag>? MaterialTags { get; set; }
 
+        public ICollection<ProductMaterial>? ProductMaterials { get; set; }
 
-        
+        public ICollection<Option>? Options { get; set; }
+
+        public ICollection<TypeMaterials>? TypeMaterials { get; set; }
+
         [NotMapped]
         public bool IsUnlimited => Stock == StockStatus.Unlimited;
 
         [NotMapped]
-        public bool HasStock => Stock == StockStatus.Limited && StockAmount > 0;
+        public bool HasStock => Stock == StockStatus.Unlimited || (Stock == StockStatus.Limited && StockAmount > 0);
 
 
     }

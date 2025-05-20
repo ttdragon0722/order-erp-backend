@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using erp_server.Models.Enums;
 
 namespace erp_server.Models
@@ -13,8 +14,13 @@ namespace erp_server.Models
         [MaxLength(100)] // 避免索引過長
         public required string Name { get; set; }
         public required ColorName Color { get; set; }
+        public bool Enable { get; set; } = true;
 
-        public virtual ICollection<MaterialTags> MaterialTags { get; set; } = new List<MaterialTags>();
+        [JsonIgnore]
+        public ICollection<MaterialTag>? MaterialTags { get; set; }
+        
+        [JsonIgnore]
+        public ICollection<ProductTag>? ProductTags { get; set; }
 
     }
 }

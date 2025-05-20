@@ -71,8 +71,14 @@ void RegisterScopedServices(IServiceCollection services)
 {
     builder.Services.AddScoped<DatabaseTester>();
     services.AddScoped<UserService>();
+    services.AddScoped<ClassificationService>();
     services.AddScoped<MaterialService>();
     services.AddScoped<BusinessSettingsService>();
+    services.AddScoped<TagService>();
+    services.AddScoped<TypeMaterialsService>();
+    services.AddScoped<MaterialTagService>();
+    builder.Services.AddScoped<OptionService>();    
+    builder.Services.AddScoped<ProductService>();    
 
     // 可以在這裡繼續新增其他的 Scoped 服務
 }
