@@ -24,6 +24,7 @@ namespace erp_server.Data
         public DbSet<TypeMaterials> TypeMaterials { get; set; }
         public DbSet<OptionChildren> OptionChildren { get; set; }
         public DbSet<OptionRadio> OptionRadios { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
 
 

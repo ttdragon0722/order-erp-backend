@@ -8,6 +8,7 @@ using erp_server.Services.Repositories;
 using erp_server.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using erp_server.Services;
 
 namespace erp_server.Controllers
 {
@@ -16,10 +17,11 @@ namespace erp_server.Controllers
     /// </summary>
     [ApiController]
     [Route("api")]
-    public class UsersController(UserService userService, IConfiguration config, ILogger<UsersController> logger) : ControllerBase
+    public class UsersController(UserService userService,AuthService authService, IConfiguration config, ILogger<UsersController> logger) : ControllerBase
     {
         private readonly IConfiguration _config = config;   // 取得應用程式設定，例如 JWT 金鑰
         private readonly UserService _userService = userService;  // 使用者服務，負責資料庫存取
+        private readonly AuthService _authService = authService;  // 使用者服務，負責資料庫存取
         private readonly ILogger<UsersController> _logger = logger;  // 日誌記錄，記錄錯誤訊息
 
         /// <summary>
@@ -112,7 +114,12 @@ namespace erp_server.Controllers
                 if (user == null || !PasswordHelper.VerifyPassword(dto.Password, user.Salt, user.Password))
                     return Unauthorized();
 
-                var token = GenerateJwtToken(user);
+                var token = _authService.GenerateJwtToken(new JwtUserInfo
+                {
+                    Id = user.Id,
+                    Name = user.UserId,
+                    Role = Role.Admin
+                });
 
                 Response.Cookies.Append("auth_token", token, new CookieOptions
                 {

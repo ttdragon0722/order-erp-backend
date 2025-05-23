@@ -138,30 +138,47 @@ namespace erp_server.Services.Repositories
 
             if (product == null)
             {
-                Console.WriteLine("bye");
                 return null;
             }
 
-            // 2. 安全處理 Depends：若 ProductMaterials 為 null，則用空串列
-            var depends = new List<MaterialObj>();
+            // 2. 取 ProductMaterials → Depends
+            var productMaterialEntities = await _context.ProductMaterials
+                .Where(pm => pm.ProductId == productId)
+                .Include(pm => pm.Material)
+                .ToListAsync();
 
-            if (product.ProductMaterials?.Any() == true)
-            {
-                var materialIds = product.ProductMaterials.Select(pm => pm.MaterialId).ToList();
+            var depends = productMaterialEntities
+                .Where(pm => pm.Material != null)
+                .Select(pm => new MaterialObj
+                {
+                    Id = pm.MaterialId,
+                    Name = pm.Material!.Name
+                })
+                .ToList();
 
-                depends = await _context.Materials
-                    .Where(m => materialIds.Contains(m.Id))
-                    .Select(m => new MaterialObj
-                    {
-                        Id = m.Id,
-                        Name = m.Name
-                    })
-                    .ToListAsync();
-            }
+            // 3. 加入從 TypeMaterials 找到的 Material（使用 TypeId）
+            var typeMaterialEntities = await _context.TypeMaterials
+                .Where(tm => tm.TypeEntityId == product.TypeId)
+                .Include(tm => tm.Material)
+                .ToListAsync();
 
+            var typeDepends = typeMaterialEntities
+                .Where(tm => tm.Material != null)
+                .Select(tm => new MaterialObj
+                {
+                    Id = tm.MaterialId,
+                    Name = tm.Material!.Name
+                });
+
+            // 合併（避免重複 MaterialId）
+            var existingMaterialIds = depends.Select(d => d.Id).ToHashSet();
+            depends.AddRange(typeDepends.Where(d => !existingMaterialIds.Contains(d.Id)));
+
+
+            // 4. 取 options
             var availableOptions = await GetAvailableOptionsByProductIdAsync(productId);
 
-            // 3. 封裝成 ProductCart
+            // 5. 封裝成 ProductCart
             var productCart = new ProductCart
             {
                 Id = product.Id,

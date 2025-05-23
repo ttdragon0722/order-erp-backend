@@ -8,7 +8,6 @@ using erp_server.Data;
 // repository import
 using erp_server.Services.Repositories;
 
-// todo 刪除這個模組
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using erp_server.Services;
@@ -69,7 +68,8 @@ void TestDatabaseConnection(WebApplication app)
 // 封裝 Scoped 服務註冊邏輯
 void RegisterScopedServices(IServiceCollection services)
 {
-    builder.Services.AddScoped<DatabaseTester>();
+    services.AddScoped<AuthService>();
+    services.AddScoped<DatabaseTester>();
     services.AddScoped<UserService>();
     services.AddScoped<ClassificationService>();
     services.AddScoped<MaterialService>();
@@ -77,8 +77,10 @@ void RegisterScopedServices(IServiceCollection services)
     services.AddScoped<TagService>();
     services.AddScoped<TypeMaterialsService>();
     services.AddScoped<MaterialTagService>();
-    builder.Services.AddScoped<OptionService>();    
-    builder.Services.AddScoped<ProductService>();    
+    services.AddScoped<OptionService>();    
+    services.AddScoped<ProductService>();    
+    services.AddScoped<LineLoginService>();    
+    services.AddScoped<CustomerService>();    
 
     // 可以在這裡繼續新增其他的 Scoped 服務
 }
